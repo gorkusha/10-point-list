@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додаток зі списком пунктів</title>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        function TextFieldsApp() {
+          const [fields, setFields] = useState(Array(10).fill(''));
+          const [submitted, setSubmitted] = useState(false);
+
+          const handleFieldChange = (index, value) => {
+            if (value.length <= 150) {
+              const newFields = [...fields];
+              newFields[index] = value;
+              setFields(newFields);
+            }
+          };
+
+          const handleSubmit = () => {
+            setSubmitted(true);
+          };
+
+          const handleEdit = () => {
+            setSubmitted(false);
+          };
+
+          const handleCopy = () => {
+            const listText = fields
+              .filter(field => field.trim() !== '')
+              .map((field) => field)
+              .join('\n');
+            navigator.clipboard.writeText(listText);
+          };
+
+          const filledFields = fields.filter(field => field.trim() !== '');
+
+          if (submitted) {
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+                <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-6">Ваш список</h1>
+                  
+                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                    <ul className="space-y-3">
+                      {filledFields.map((field, index) => (
+                        <li key={index} className="text-lg text-gray-700">
+                          {field}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button
+                      onClick={handleEdit}
+                      className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                    >
+                      Редагувати
+                    </button>
+                    <button
+                      onClick={handleCopy}
+                      className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                    >
+                      Скопіювати список
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+              <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">Створити список</h1>
+                <p className="text-gray-600 mb-8">Заповніть поля нижче (максимум 150 символів кожне)</p>
+
+                <div className="space-y-4 mb-8">
+                  {fields.map((field, index) => (
+                    <div key={index} className="relative">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Пункт {index + 1}
+                      </label>
+                      <textarea
+                        value={field}
+                        onChange={(e) => handleFieldChange(index, e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                        rows="2"
+                        placeholder={`Введіть пункт ${index + 1}...`}
+                      />
+                      <div className="absolute bottom-2 right-3 text-sm text-gray-500">
+                        {field.length}/150
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={filledFields.length === 0}
+                  className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
+                    filledFields.length === 0
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
+                >
+                  Відправити ({filledFields.length} з 10)
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        ReactDOM.render(<TextFieldsApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
